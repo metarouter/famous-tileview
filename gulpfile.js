@@ -37,7 +37,10 @@ gulp.task('scripts', function (done) {
     async.each(files, function (file, done) {
       var b = browserify(file, watchify.args),
           w = watchify(b);
-      var destination = BUILD_DIR(file.split(path.sep).reverse()[1]),
+
+      var fileDir = path.dirname(file),
+          baseDir = fileDir.replace(SRC_DIR(), ''), // fileDir - SRC_DIR
+          destination = BUILD_DIR.apply(null, baseDir.split(path.sep)),
           build = buildApp.bind(null, w, appFileName, destination);
 
       build(done);
