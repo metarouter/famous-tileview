@@ -68,6 +68,4 @@ gulp.task('watch', function () {
   gulp.watch(STATIC_FILES, ['static']);
 });
 
-gulp.task('default', function () {
-
-});
+gulp.task('default', ['static', 'watch', 'scripts', 'http']);
