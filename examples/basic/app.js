@@ -1,5 +1,4 @@
-var Engine  = require('famous/core/Engine'),
-    Surface = require('famous/core/Surface');
+var Engine  = require('famous/core/Engine');
 
 var AppView = require('./views/AppView');
 
