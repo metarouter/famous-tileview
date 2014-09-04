@@ -11,6 +11,13 @@ var CURRENT_DIR = path.join.bind(path, process.cwd()),
     SRC_DIR     = CURRENT_DIR.bind(null, 'examples'),
     BUILD_DIR   = CURRENT_DIR.bind(null, 'build');
 
+function buildApp (bw, appFileName, destination, done) {
+  bw.bundle()
+    .pipe(source(appFileName))
+    .pipe(gulp.dest(destination))
+    .on('end', done);
+}
+
 gulp.task('static', function () {
   var staticFiles = ['*.html', '*.css'].map(function (file) {
     return SRC_DIR('**', file);
@@ -20,19 +27,11 @@ gulp.task('static', function () {
   gulp.src(staticFiles).pipe(gulp.dest(destination));
 });
 
-function buildApp (bw, appFileName, destination, done) {
-  bw.bundle()
-    .pipe(source(appFileName))
-    .pipe(gulp.dest(destination))
-    .on('end', done);
-}
-
 gulp.task('scripts', function (done) {
   var appFileName = 'app.js';
+
   glob(SRC_DIR('**', appFileName), function (err, files) {
-    if (err) {
-      return gutil.log(err);
-    }
+    if (err) { return gutil.log(err); }
 
     async.each(files, function (file, done) {
       var b = browserify(file, watchify.args),
