@@ -6,10 +6,12 @@ var CURRENT_DIR = path.join.bind(path, process.cwd()),
     BUILD_DIR   = CURRENT_DIR.bind(null, 'build');
 
 gulp.task('static', function () {
-  var staticFiles = ['*.html', '*.css'].map(SRC_DIR.bind(null, '**'));
+  var staticFiles = ['*.html', '*.css'].map(function (file) {
+    return SRC_DIR('**', file);
+  });
   var destination = BUILD_DIR();
 
-  gulp.src(staticFile, { read: false }).pipe(gulp.dest(destination));
+  gulp.src(staticFiles).pipe(gulp.dest(destination));
 });
 
 gulp.task('default', function () {
