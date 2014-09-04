@@ -16,5 +16,8 @@
     "url": "https://github.com/metarouter/famous-tileview/issues"
   },
   "homepage": "https://github.com/metarouter/famous-tileview",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "famous": "^0.2.2"
+  }
 }
