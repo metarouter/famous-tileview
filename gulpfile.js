@@ -5,7 +5,8 @@ var gulp       = require('gulp'),
     browserify = require('browserify'),
     watchify   = require('watchify'),
     async      = require('async'),
-    source     = require('vinyl-source-stream');
+    source     = require('vinyl-source-stream'),
+    rimraf     = require('gulp-rimraf');
 
 var CURRENT_DIR = path.join.bind(path, process.cwd()),
     SRC_DIR     = CURRENT_DIR.bind(null, 'examples'),
@@ -46,6 +47,10 @@ gulp.task('scripts', function (done) {
       w.on('update', build.bind(null, Function.prototype));
     }, done);
   });
+});
+
+gulp.task('clean', function () {
+  gulp.src(BUILD_DIR(), { read: false }).pipe(rimraf());
 });
 
 gulp.task('default', function () {
