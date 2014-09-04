@@ -6,7 +6,8 @@ var gulp       = require('gulp'),
     watchify   = require('watchify'),
     async      = require('async'),
     source     = require('vinyl-source-stream'),
-    rimraf     = require('gulp-rimraf');
+    rimraf     = require('gulp-rimraf'),
+    webserver  = require('gulp-webserver');
 
 var CURRENT_DIR  = path.join.bind(path, process.cwd()),
     SRC_DIR      = CURRENT_DIR.bind(null, 'examples'),
@@ -52,6 +53,15 @@ gulp.task('scripts', function (done) {
 
 gulp.task('clean', function () {
   gulp.src(BUILD_DIR(), { read: false }).pipe(rimraf());
+});
+
+gulp.task('http', function () {
+  gulp.src('build')
+      .pipe(webserver({
+        livereload: true,
+        directoryListing: true,
+        port: DEFAULT_PORT
+      }));
 });
 
 gulp.task('watch', function () {
