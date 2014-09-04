@@ -1,0 +1,20 @@
+{
+  "name": "famous-tileview",
+  "version": "0.1.0",
+  "description": "Famo.us TileView",
+  "main": "TileView.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metarouter/famous-tileview.git"
+  },
+  "keywords": [
+    "famo.us"
+  ],
+  "author": "Arturas Lebedevas <metarouter@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/metarouter/famous-tileview/issues"
+  },
+  "homepage": "https://github.com/metarouter/famous-tileview",
+  "private": true
+}
