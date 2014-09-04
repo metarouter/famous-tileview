@@ -8,9 +8,13 @@ var gulp       = require('gulp'),
     source     = require('vinyl-source-stream'),
     rimraf     = require('gulp-rimraf');
 
-var CURRENT_DIR = path.join.bind(path, process.cwd()),
-    SRC_DIR     = CURRENT_DIR.bind(null, 'examples'),
-    BUILD_DIR   = CURRENT_DIR.bind(null, 'build');
+var CURRENT_DIR  = path.join.bind(path, process.cwd()),
+    SRC_DIR      = CURRENT_DIR.bind(null, 'examples'),
+    BUILD_DIR    = CURRENT_DIR.bind(null, 'build'),
+    DEFAULT_PORT = 9000,
+    STATIC_FILES = ['*.html', '*.css'].map(function (file) {
+      return SRC_DIR('**', file);
+    });
 
 function buildApp (bw, appFileName, destination, done) {
   bw.bundle()
@@ -20,12 +24,9 @@ function buildApp (bw, appFileName, destination, done) {
 }
 
 gulp.task('static', function () {
-  var staticFiles = ['*.html', '*.css'].map(function (file) {
-    return SRC_DIR('**', file);
-  });
   var destination = BUILD_DIR();
 
-  gulp.src(staticFiles).pipe(gulp.dest(destination));
+  gulp.src(STATIC_FILES).pipe(gulp.dest(destination));
 });
 
 gulp.task('scripts', function (done) {
@@ -51,6 +52,10 @@ gulp.task('scripts', function (done) {
 
 gulp.task('clean', function () {
   gulp.src(BUILD_DIR(), { read: false }).pipe(rimraf());
+});
+
+gulp.task('watch', function () {
+  gulp.watch(STATIC_FILES, ['static']);
 });
 
 gulp.task('default', function () {
