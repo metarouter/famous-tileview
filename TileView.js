@@ -44,7 +44,7 @@ TileView.DEFAULT_OPTIONS = {
   tileWidth: 50,
   transition: {
     duration: 250,
-    curve: 'easeIn'
+    curve: 'easeOutBounce'
   }
 };
 
@@ -82,10 +82,16 @@ function _setupInputHandler () {
   }.bind(this));
   sync.on('end', function () {
     var currentPosition = position.get(),
-        newPosition     = Math.round(currentPosition / tileWidth) * tileWidth;
+        totalWidth      = this._totalWidth,
+        scrollerWidth   = this._scroller.getSize(true)[0],
+        lastPosition    = totalWidth - scrollerWidth;
 
-    // TODO
-    // position.set(newPosition, transition);
+    if (currentPosition < 0) {
+      position.set(0, transition);
+    } else if (currentPosition > lastPosition) {
+      position.set(lastPosition, transition);
+    }
+
   }.bind(this));
 }
 
