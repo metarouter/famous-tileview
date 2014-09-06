@@ -60,6 +60,58 @@ TileView.prototype.sequenceFrom = function (node) {
   this._totalWidth = this._items.length * this.options.tileWidth;
 };
 
+TileView.prototype.goToTile = function (tile, position) {
+  var tileIndex = this._items.indexOf(tile);
+
+  return this.goToIndex(tileIndex, position);
+};
+
+// position:
+// -1 - left edge
+//  0 - middle
+//  1 - right edge
+TileView.prototype.goToIndex = function (tileIndex, pos) {
+  var tileWidth        = this.options.tileWidth,
+      scrollerWidth    = this._scroller.getSize(true)[0],
+      position         = this._position,
+      sideWidth        = scrollerWidth / 3,
+      sides            = [sideWidth, sideWidth, sideWidth],
+      currentPosition  = position.get(),
+      scrollerTooSmall = sideWidth < tileWidth,
+      itemPosition     = tileWidth * tileIndex;
+
+  if (scrollerTooSmall) {
+    var adjSides = sideWidth - (tileWidth - sideWidth) / 2;
+
+    sides = sides.map(function (sw, idx) {
+      return (idx === pos + 1) ? tileWidth : adjSides;
+    });
+  }
+
+  var sections = [0, sides[0], sides[0] + sides[1]];
+  if (scrollerTooSmall) {
+    sections[2] += sides[2] - tileWidth;
+  }
+
+  var sectionRange = [
+    currentPosition + sections[pos+1],
+    currentPosition + (sections[pos+1] + sides[pos+1])
+  ];
+
+  var inRange = itemPosition >= sectionRange[0] && itemPosition+tileWidth <= sectionRange[1];
+
+  if (! inRange) {
+    var left   = sectionRange[0] - itemPosition,
+        right  = sectionRange[1] - itemPosition,
+        newPosition = (Math.abs(left) < Math.abs(right)) ? left : right - tileWidth;
+
+    newPosition = currentPosition - newPosition;
+    newPosition = _boundaries.call(this, newPosition, 0);
+
+    position.set(newPosition, this.options.transition);
+  }
+};
+
 function _setupInputHandler () {
   var position   = this._position,
       transition = this.options.transition,
@@ -75,8 +127,7 @@ function _setupInputHandler () {
         scrollerWidth   = this._scroller.getSize(true)[0],
         totalWidth      = this._totalWidth;
 
-    newPosition = Math.max(tileWidth * 0.35 * -1, newPosition);
-    newPosition = Math.min(totalWidth-scrollerWidth-(tileWidth * 0.35 * -1), newPosition);
+    newPosition = _boundaries.call(this, newPosition, 0.35);
 
     position.set(newPosition);
   }.bind(this));
@@ -102,4 +153,15 @@ function _createScroller () {
   this._scroller.positionFrom(this._position);
 
   this.add(this._scroller);
+}
+
+
+function _boundaries (newPosition, padding) {
+  var scrollerWidth = this._scroller.getSize(true)[0],
+      tileWidth     = this.options.tileWidth * padding * -1,
+      totalWidth    = this._totalWidth;
+
+  newPosition = Math.max(tileWidth, newPosition);
+  newPosition = Math.min(totalWidth-scrollerWidth-tileWidth, newPosition);
+  return newPosition;
 }
