@@ -25,6 +25,7 @@ function TileView () {
   View.apply(this, arguments);
 
   this._items = [];
+  this._sides = [0, 0, 0];
   this._totalWidth = 0;
 
   this._position = new Transitionable(0);
@@ -49,6 +50,16 @@ TileView.DEFAULT_OPTIONS = {
 };
 
 module.exports = TileView;
+
+TileView.prototype.setSides = function (sides) {
+  this._sides = sides;
+
+  return sides;
+};
+
+TileView.prototype.getSides = function () {
+  return this._sides;
+};
 
 TileView.prototype.sequenceFrom = function (node) {
   this._scroller.sequenceFrom(node);
@@ -75,7 +86,7 @@ TileView.prototype.goToIndex = function (tileIndex, pos) {
       scrollerWidth    = this._scroller.getSize(true)[0],
       position         = this._position,
       sideWidth        = scrollerWidth / 3,
-      sides            = [sideWidth, sideWidth, sideWidth],
+      sides            = this.setSides([sideWidth, sideWidth, sideWidth]),
       currentPosition  = position.get(),
       scrollerTooSmall = sideWidth < tileWidth,
       itemPosition     = tileWidth * tileIndex;
@@ -86,6 +97,7 @@ TileView.prototype.goToIndex = function (tileIndex, pos) {
     sides = sides.map(function (sw, idx) {
       return (idx === pos + 1) ? tileWidth : adjSides;
     });
+    this.setSides(sides);
   }
 
   var sections = [0, sides[0], sides[0] + sides[1]];
