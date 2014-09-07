@@ -53,7 +53,7 @@ function createTileView (tileWidth, tileNum) {
       size: [tileWidth, undefined]
     });
 
-    tmp.pipe(tileView._scroller);
+    tmp.pipe(tileView);
     items.push(tmp);
   }
 
