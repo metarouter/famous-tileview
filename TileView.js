@@ -76,9 +76,8 @@ TileView.prototype.getSides = function () {
 TileView.prototype.sequenceFrom = function (node) {
   this._scroller.sequenceFrom(node);
   this._items = this._scroller._node._.array;
-  this._items.forEach(function (item) {
-    item.pipe(this._sync);
-  }.bind(this));
+
+  this._eventInput.pipe(this._sync);
 
   this._totalWidth = this._items.length * this.options.tileWidth;
 };
