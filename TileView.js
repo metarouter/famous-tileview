@@ -118,6 +118,8 @@ TileView.prototype.goToIndex = function (tileIndex, pos) {
       scrollerTooSmall = (! this.fitsCompletely()),
       itemPosition     = tileWidth * tileIndex;
 
+  if (this._totalWidth < this._scroller.getSize(true)[0]) { return position.set(0); }
+
   var sections = [0, sides[0], sides[0] + sides[1]];
   if (scrollerTooSmall) {
     sections[2] += sides[2] - tileWidth;
@@ -157,6 +159,8 @@ function _setupInputHandler () {
         scrollerWidth   = this._scroller.getSize(true)[0],
         totalWidth      = this._totalWidth;
 
+    if (totalWidth < scrollerWidth) { return position.set(0); }
+
     newPosition = _boundaries.call(this, newPosition, 0.35);
 
     position.set(newPosition);
@@ -166,6 +170,8 @@ function _setupInputHandler () {
         totalWidth      = this._totalWidth,
         scrollerWidth   = this._scroller.getSize(true)[0],
         lastPosition    = totalWidth - scrollerWidth;
+
+    if (totalWidth < scrollerWidth) { return position.set(0); }
 
     if (currentPosition < 0) {
       position.set(0, transition);
