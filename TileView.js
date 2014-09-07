@@ -25,7 +25,8 @@ function TileView () {
   View.apply(this, arguments);
 
   this._items = [];
-  this._sides = [0, 0, 0];
+  this._sectionId = 0;
+  this._sides = new Transitionable([0, 0, 0]);
   this._totalWidth = 0;
 
   this._position = new Transitionable(0);
@@ -51,14 +52,25 @@ TileView.DEFAULT_OPTIONS = {
 
 module.exports = TileView;
 
-TileView.prototype.setSides = function (sides) {
-  this._sides = sides;
-
-  return sides;
-};
-
 TileView.prototype.getSides = function () {
-  return this._sides;
+  var tileWidth        = this.options.tileWidth,
+      sideWidth        = this.basicSideWidth(),
+      scrollerTooSmall = (! this.fitsCompletely()),
+      sectionId        = this._sectionId,
+      sides            = this._sides.get();
+
+  if (scrollerTooSmall) {
+    var adjSides = sideWidth - (tileWidth - sideWidth) / 2;
+
+    sides = sides.map(function (sw, idx) {
+      return (idx === sectionId + 1) ? tileWidth : adjSides;
+    });
+  } else {
+    sides = [sideWidth, sideWidth, sideWidth];
+  }
+
+  this._sides.set(sides);
+  return sides;
 };
 
 TileView.prototype.sequenceFrom = function (node) {
@@ -69,6 +81,21 @@ TileView.prototype.sequenceFrom = function (node) {
   }.bind(this));
 
   this._totalWidth = this._items.length * this.options.tileWidth;
+};
+
+TileView.prototype.fitsCompletely = function () {
+  var sideWidth = this.basicSideWidth(),
+      tileWidth = this.options.tileWidth;
+
+  return sideWidth >= tileWidth;
+};
+
+TileView.prototype.basicSideWidth = function () {
+  var SIDES_NUM = 3;
+
+  var scrollerWidth = this._scroller.getSize(true)[0];
+
+  return scrollerWidth / SIDES_NUM;
 };
 
 TileView.prototype.goToTile = function (tile, position) {
@@ -82,23 +109,14 @@ TileView.prototype.goToTile = function (tile, position) {
 //  0 - middle
 //  1 - right edge
 TileView.prototype.goToIndex = function (tileIndex, pos) {
+  this._sectionId = pos;
+
   var tileWidth        = this.options.tileWidth,
-      scrollerWidth    = this._scroller.getSize(true)[0],
       position         = this._position,
-      sideWidth        = scrollerWidth / 3,
-      sides            = this.setSides([sideWidth, sideWidth, sideWidth]),
+      sides            = this.getSides(),
       currentPosition  = position.get(),
-      scrollerTooSmall = sideWidth < tileWidth,
+      scrollerTooSmall = (! this.fitsCompletely()),
       itemPosition     = tileWidth * tileIndex;
-
-  if (scrollerTooSmall) {
-    var adjSides = sideWidth - (tileWidth - sideWidth) / 2;
-
-    sides = sides.map(function (sw, idx) {
-      return (idx === pos + 1) ? tileWidth : adjSides;
-    });
-    this.setSides(sides);
-  }
 
   var sections = [0, sides[0], sides[0] + sides[1]];
   if (scrollerTooSmall) {
