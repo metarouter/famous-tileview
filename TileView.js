@@ -124,7 +124,9 @@ TileView.prototype.goToIndex = function (tileIndex, pos) {
     newPosition = currentPosition - newPosition;
     newPosition = _boundaries.call(this, newPosition, 0);
 
-    position.set(newPosition, this.options.transition);
+    if (! isNaN(newPosition)) {
+      position.set(newPosition, this.options.transition);
+    }
   }
 };
 
