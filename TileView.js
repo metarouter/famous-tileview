@@ -35,6 +35,10 @@ TileView.DEFAULT_OPTIONS = {
 
 module.exports = TileView;
 
+TileView.prototype.totalWidth = function () {
+  return this._items.length * this.options.tileWidth;
+};
+
 TileView.prototype.getSides = function () {
   var tileWidth        = this.options.tileWidth,
       sideWidth        = this.basicSideWidth(),
@@ -61,8 +65,6 @@ TileView.prototype.sequenceFrom = function (node) {
   this._items = this._scroller._node._.array;
 
   this._eventInput.pipe(this._sync);
-
-  this._totalWidth = this._items.length * this.options.tileWidth;
 };
 
 TileView.prototype.fitsCompletely = function () {
@@ -100,7 +102,7 @@ TileView.prototype.goToIndex = function (tileIndex, pos) {
       scrollerTooSmall = (! this.fitsCompletely()),
       itemPosition     = tileWidth * tileIndex;
 
-  if (this._totalWidth < this._scroller.getSize(true)[0]) { return position.set(0); }
+  if (this.totalWidth() < this._scroller.getSize(true)[0]) { return position.set(0); }
 
   var sections = [0, sides[0], sides[0] + sides[1]];
   if (scrollerTooSmall) {
@@ -137,7 +139,7 @@ function _setupInputHandler () {
     var currentPosition = position.get(),
         newPosition     = currentPosition - data.delta,
         scrollerWidth   = this._scroller.getSize(true)[0],
-        totalWidth      = this._totalWidth;
+        totalWidth      = this.totalWidth();
 
     if (totalWidth < scrollerWidth) { return position.set(0); }
 
@@ -147,7 +149,7 @@ function _setupInputHandler () {
   }.bind(this));
   sync.on('end', function () {
     var currentPosition = position.get(),
-        totalWidth      = this._totalWidth,
+        totalWidth      = this.totalWidth(),
         scrollerWidth   = this._scroller.getSize(true)[0],
         lastPosition    = totalWidth - scrollerWidth;
 
@@ -175,7 +177,7 @@ function _createScroller () {
 function _boundaries (newPosition, padding) {
   var scrollerWidth = this._scroller.getSize(true)[0],
       tileWidth     = this.options.tileWidth * padding * -1,
-      totalWidth    = this._totalWidth;
+      totalWidth    = this.totalWidth();
 
   newPosition = Math.max(tileWidth, newPosition);
   newPosition = Math.min(totalWidth-scrollerWidth-tileWidth, newPosition);
