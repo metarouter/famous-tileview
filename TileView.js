@@ -4,22 +4,7 @@ var View           = require('famous/core/View'),
     Scroller       = require('famous/views/Scroller'),
     Transitionable = require('famous/transitions/Transitionable'),
     GenericSync    = require('famous/inputs/GenericSync'),
-    TouchSync      = require('famous/inputs/TouchSync'),
-    ScrollSync     = require('famous/inputs/ScrollSync'),
-    MouseSync      = require('famous/inputs/MouseSync'),
     Utility        = require('famous/utilities/Utility');
-
-function setDirection (syncClass, direction, opts) {
-  opts = opts || {};
-  opts.direction = direction;
-  return new (syncClass)(opts);
-}
-
-GenericSync.register({
-  scroll: setDirection.bind(null, ScrollSync, Utility.Direction.Y),
-  touch: setDirection.bind(null, TouchSync, Utility.Direction.X),
-  mouse: setDirection.bind(null, MouseSync, Utility.Direction.X)
-});
 
 function TileView () {
   View.apply(this, arguments);
@@ -31,9 +16,7 @@ function TileView () {
 
   this._position = new Transitionable(0);
   this._scroller = undefined;
-  this._sync     = new GenericSync(
-    ['scroll', 'touch', 'mouse']
-  );
+  this._sync     = new GenericSync();
 
   _setupInputHandler.call(this);
   _createScroller.call(this);
@@ -152,9 +135,7 @@ function _setupInputHandler () {
   sync.on('start', position.halt.bind(position));
   sync.on('update', function (data) {
     var currentPosition = position.get(),
-        // hack to determine scroll event
-        isScroll        = (data.slip && data.slip.constructor === Boolean),
-        newPosition     = currentPosition + (isScroll ? data.delta : -1 * data.delta),
+        newPosition     = currentPosition - data.delta,
         scrollerWidth   = this._scroller.getSize(true)[0],
         totalWidth      = this._totalWidth;
 
