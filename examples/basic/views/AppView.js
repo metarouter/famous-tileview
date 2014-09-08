@@ -5,7 +5,11 @@ var View             = require('famous/core/View'),
     Transform        = require('famous/core/Transform'),
     SequentialLayout = require('famous/views/SequentialLayout'),
     ImageSurface     = require('famous/surfaces/ImageSurface'),
-    Timer            = require('famous/utilities/Timer');
+    GenericSync      = require('famous/inputs/GenericSync'),
+    ScrollSync       = require('famous/inputs/ScrollSync'),
+    MouseSync        = require('famous/inputs/MouseSync'),
+    TouchSync        = require('famous/inputs/TouchSync'),
+    Utility          = require('famous/utilities/Utility');
 
 var TileView = require('../../../TileView');
 
@@ -18,6 +22,7 @@ function AppView () {
   this._rootNode = this.add(new RenderNode(this._rootModifier));
 
   _createLayout.call(this);
+  _setupEventHandlers.call(this);
 }
 
 AppView.prototype = Object.create(View.prototype);
@@ -30,11 +35,28 @@ AppView.DEFAULT_OPTIONS = {
 
 module.exports = AppView;
 
+function setSyncDirection (syncClass, direction, opts) {
+  opts = opts || {};
+  opts.direction = direction;
+  return new (syncClass)(opts);
+}
+
+function _setupEventHandlers () {
+  GenericSync.register({
+    scroll: setSyncDirection.bind(null, ScrollSync, Utility.Direction.Y),
+    touch: setSyncDirection.bind(null, TouchSync, Utility.Direction.X),
+    mouse: setSyncDirection.bind(null, MouseSync, Utility.Direction.X)
+  });
+
+  this.tileView._sync.addSync(['scroll', 'touch', 'mouse']);
+}
+
 function _createLayout () {
   var tileView = createTileView(this.options.tileWidth, this.options.tileNum);
 
   this.add(new Modifier({ size: [undefined, 200] }))
       .add(tileView);
+  this.tileView = tileView;
 
   this.sections = createSections(tileView);
   this.add(new Modifier({ transform: Transform.translate(0, 250, 0) }))
